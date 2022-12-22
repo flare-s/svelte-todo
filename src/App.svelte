@@ -38,6 +38,13 @@
 		todos = todos.filter(todo => todo.id !== id)
 	}
 
+	const checkAllTodos = () => {
+		todos = todos.map(todo => {
+			todo.isComplete = true;
+			return todo
+		})
+	}
+
   </script>
   
   <div class="todo-app-container">
@@ -85,7 +92,7 @@
   
 	  <div class="check-all-container">
 		<div>
-		  <div class="button">Check All</div>
+		  <button on:click={checkAllTodos} class="button">Check All</button>
 		</div>
   
 		<span>3 items remaining</span>
