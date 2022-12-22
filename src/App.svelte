@@ -1,6 +1,7 @@
 <script>
 	import "./css/reset.css";
 	import "./css/style.css";
+	import {fade, fly} from "svelte/transition";
 
 	let todos = [
 		{
@@ -90,6 +91,7 @@
 			todos = todos;
 		}
 	}
+	let todoListEmpty;
 
 	
   </script>
@@ -108,8 +110,8 @@
 	  {#if todos.length > 0}
 		 <!-- content here -->
 		 <ul class="todo-list">
-			{#each filteredTodos as todo}
-			<li class="todo-item-container {todo.id}" class:line-through={todo.isComplete}>
+			{#each filteredTodos as todo (todo.id)}
+			<li class="todo-item-container {todo.id}" class:line-through={todo.isComplete} in:fade out:fly={{duration: 500, x: 30}}>
 				<div class="todo-item">
 				  <input type="checkbox" bind:checked={todo.isComplete}/>
 				  {#if !todo.isEditing}
@@ -149,8 +151,12 @@
 			<div>
 			  <button on:click={checkAllTodos} class="button">Check All</button>
 			</div>
-	  
-			<span>{uncompletedTodos} items remaining</span>
+			<p>
+			{#key uncompletedTodos}
+			<span in:fly={{y: -10}} style="display: inline-block">{uncompletedTodos}</span>
+			{/key}
+			<span>items remaining</span></p>
+			
 		  </div>
 	  
 		  <div class="other-buttons-container">
@@ -164,7 +170,7 @@
 			</div>
 		  </div>
 	  {:else}
-		 <p class="todo-list-empty">You don't have any todos at the moment</p>
+		 <p class="todo-list-empty" bind:this={todoListEmpty} in:fade={{delay: 1000}}>You don't have any todos at the moment</p>
 	  {/if}
 	  
 	</div>
