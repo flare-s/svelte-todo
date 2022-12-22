@@ -20,6 +20,8 @@
 		isEditing: false}
 	]
 
+	$: uncompletedTodos = todos.filter(todo => !todo.isComplete).length
+
 	const createId = () => {
 		return todos.length === 0 ? 1 : todos[todos.length - 1].id + 1
 	}
@@ -99,7 +101,7 @@
 		  <button on:click={checkAllTodos} class="button">Check All</button>
 		</div>
   
-		<span>3 items remaining</span>
+		<span>{uncompletedTodos} items remaining</span>
 	  </div>
   
 	  <div class="other-buttons-container">
