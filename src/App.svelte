@@ -16,7 +16,7 @@
 		{
 		id: 3,
 		title: "Cook something to eat",
-		isComplete: false,
+		isComplete: true,
 		isEditing: false}
 	]
 
@@ -50,9 +50,9 @@
   
 	  <ul class="todo-list">
 		{#each todos as todo}
-		<li class="todo-item-container {todo.id}">
+		<li class="todo-item-container {todo.id}" class:line-through={todo.isComplete}>
 			<div class="todo-item">
-			  <input type="checkbox" />
+			  <input type="checkbox" bind:checked={todo.isComplete}/>
 			  <span class="todo-item-label">{todo.title}</span>
 			  <!-- <input
 				type="text"
