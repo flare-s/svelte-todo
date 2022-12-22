@@ -20,22 +20,37 @@
 		isEditing: false}
 	]
 
+	const createId = () => {
+		return todos.length === 0 ? 1 : todos[todos.length - 1].id + 1
+	}
+	let todoTitle = "";
+	const addNewTodo = () => {
+		todos = [...todos, {
+			id: createId(),
+			title: todoTitle,
+			isComplete: false,
+			isEditing: false
+		}]
+		todoTitle = ""
+	}
+
   </script>
   
   <div class="todo-app-container">
 	<div class="todo-app">
 	  <h2>Todo App</h2>
-	  <form action="#">
+	  <form action="#" on:submit|preventDefault={addNewTodo}>
 		<input
 		  type="text"
 		  class="todo-input"
 		  placeholder="What do you need to do?"
+		  bind:value={todoTitle}
 		/>
 	  </form>
   
 	  <ul class="todo-list">
 		{#each todos as todo}
-		<li class="todo-item-container">
+		<li class="todo-item-container {todo.id}">
 			<div class="todo-item">
 			  <input type="checkbox" />
 			  <span class="todo-item-label">{todo.title}</span>
