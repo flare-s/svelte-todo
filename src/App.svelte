@@ -34,6 +34,10 @@
 		todoTitle = ""
 	}
 
+	const deleteTodo = (id) => {
+		todos = todos.filter(todo => todo.id !== id)
+	}
+
   </script>
   
   <div class="todo-app-container">
@@ -60,7 +64,7 @@
 				value="Finish Svelte Series"
 			  /> -->
 			</div>
-			<button class="x-button">
+			<button class="x-button" on:click={deleteTodo(todo.id)}>
 			  <svg
 				class="x-button-icon"
 				fill="none"
