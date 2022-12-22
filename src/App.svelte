@@ -2,6 +2,8 @@
 	import "./css/reset.css";
 	import "./css/style.css";
 	import {fade, fly} from "svelte/transition";
+  import NewTodoForm from "./NewTodoForm.svelte";
+  import TodoList from "../TodoList.svelte";
 
 	let todos = [
 		{
@@ -36,15 +38,13 @@
 
 	$: uncompletedTodos = todos.filter(todo => !todo.isComplete).length
 
-	let todoTitle = "";
-	const addNewTodo = () => {
+	const addNewTodo = (event) => {
 		todos = [...todos, {
 			id: createId(),
-			title: todoTitle,
+			title: event.detail.todoTitle,
 			isComplete: false,
 			isEditing: false
 		}]
-		todoTitle = ""
 	}
 
 	const deleteTodo = (id) => {
@@ -60,6 +60,10 @@
 
 	const clearCompletedTodos = () => {
 		todos = todos.filter(todo => !todo.isComplete)
+	}
+
+	const updateFilter = (filter) => {
+		currentFilter = filter
 	}
 
 	let cachedEditedTodoTitle = "";
@@ -99,76 +103,10 @@
   <div class="todo-app-container">
 	<div class="todo-app">
 	  <h2>Todo App</h2>
-	  <form action="#" on:submit|preventDefault={addNewTodo}>
-		<input
-		  type="text"
-		  class="todo-input"
-		  placeholder="What do you need to do?"
-		  bind:value={todoTitle}
-		/>
-	  </form>
+	  <NewTodoForm on:newTodoAdded={addNewTodo} />
 	  {#if todos.length > 0}
 		 <!-- content here -->
-		 <ul class="todo-list">
-			{#each filteredTodos as todo (todo.id)}
-			<li class="todo-item-container {todo.id}" class:line-through={todo.isComplete} in:fade out:fly={{duration: 500, x: 30}}>
-				<div class="todo-item">
-				  <input type="checkbox" bind:checked={todo.isComplete}/>
-				  {#if !todo.isEditing}
-				  <span class="todo-item-label" on:dblclick={editTodo(todo)}>{todo.title}</span>
-
-				  {:else}
-				  <input
-				  type="text"
-				  class="todo-item-input"
-				  bind:value={todo.title}
-				  on:blur={editTodoDone(todo)}
-				  on:keyup={(e) => exitEditingByKeyup(e, todo)}
-				  autofocus
-				/>
-				  {/if}
-				</div>
-				<button class="x-button" on:click={deleteTodo(todo.id)}>
-				  <svg
-					class="x-button-icon"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				  >
-					<path
-					  strokeLinecap="round"
-					  strokeLinejoin="round"
-					  strokeWidth={2}
-					  d="M6 18L18 6M6 6l12 12"
-					/>
-				  </svg>
-				</button>
-			  </li>
-			{/each}
-		  </ul>
-	  
-		  <div class="check-all-container">
-			<div>
-			  <button on:click={checkAllTodos} class="button">Check All</button>
-			</div>
-			<p>
-			{#key uncompletedTodos}
-			<span in:fly={{y: -10}} style="display: inline-block">{uncompletedTodos}</span>
-			{/key}
-			<span>items remaining</span></p>
-			
-		  </div>
-	  
-		  <div class="other-buttons-container">
-			<div>
-			  <button class="button filter-button" on:click={() => currentFilter = "all"} class:filter-button-active={currentFilter === "all"}> All </button>
-			  <button class="button filter-button" on:click={() => currentFilter = "active"} class:filter-button-active={currentFilter === "active"}>Active</button>
-			  <button class="button filter-button" on:click={() => currentFilter = "completed"} class:filter-button-active={currentFilter === "completed"}>Completed</button>
-			</div>
-			<div>
-			  <button class="button" on:click={clearCompletedTodos}>Clear completed</button>
-			</div>
-		  </div>
+		 <TodoList filteredTodos={filteredTodos} currentFilter={currentFilter} uncompletedTodos={uncompletedTodos} on:todoDeleted={(event) => deleteTodo(event.detail.id)} on:allTodosChecked={checkAllTodos} on:completedTodosCleared={clearCompletedTodos} on:todoEdited={(event) => editTodo(event.detail.todo)} on:todoEditingDone={(event) => editTodoDone(event.detail.todo)} on:exitedEditing={(event) => exitEditingByKeyup(event.detail.event, event.detail.todo)} on:filterUpdated={(event) => updateFilter(event.detail.filter)}  />
 	  {:else}
 		 <p class="todo-list-empty" bind:this={todoListEmpty} in:fade={{delay: 1000}}>You don't have any todos at the moment</p>
 	  {/if}
