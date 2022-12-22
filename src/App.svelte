@@ -61,6 +61,37 @@
 		todos = todos.filter(todo => !todo.isComplete)
 	}
 
+	let cachedEditedTodoTitle = "";
+
+	const editTodo = (todo) => {
+		cachedEditedTodoTitle = todo.title;
+		todo.isEditing = true;
+		todos = todos;
+	}
+
+	const editTodoDone = (todo) => {
+		todo.isEditing = false;
+		if (todo.title.trim() === "") {
+			todo.title = cachedEditedTodoTitle;
+		}
+		cachedEditedTodoTitle = ""
+		todos = todos;
+	}
+
+	const exitEditingByKeyup = (event, todo) => {
+		if (event.key === "Enter") {
+			editTodoDone(todo);
+		}
+
+		if (event.key === "Escape") {
+			todo.isEditing = false;
+			todo.title = cachedEditedTodoTitle;
+			cachedEditedTodoTitle = ""
+			todos = todos;
+		}
+	}
+
+	
   </script>
   
   <div class="todo-app-container">
@@ -81,12 +112,19 @@
 			<li class="todo-item-container {todo.id}" class:line-through={todo.isComplete}>
 				<div class="todo-item">
 				  <input type="checkbox" bind:checked={todo.isComplete}/>
-				  <span class="todo-item-label">{todo.title}</span>
-				  <!-- <input
-					type="text"
-					class="todo-item-input"
-					value="Finish Svelte Series"
-				  /> -->
+				  {#if !todo.isEditing}
+				  <span class="todo-item-label" on:dblclick={editTodo(todo)}>{todo.title}</span>
+
+				  {:else}
+				  <input
+				  type="text"
+				  class="todo-item-input"
+				  bind:value={todo.title}
+				  on:blur={editTodoDone(todo)}
+				  on:keyup={(e) => exitEditingByKeyup(e, todo)}
+				  autofocus
+				/>
+				  {/if}
 				</div>
 				<button class="x-button" on:click={deleteTodo(todo.id)}>
 				  <svg
