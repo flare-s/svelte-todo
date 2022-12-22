@@ -45,6 +45,10 @@
 		})
 	}
 
+	const clearCompletedTodos = () => {
+		todos = todos.filter(todo => !todo.isComplete)
+	}
+
   </script>
   
   <div class="todo-app-container">
@@ -105,7 +109,7 @@
 		  <button class="button filter-button">Completed</button>
 		</div>
 		<div>
-		  <button class="button">Clear completed</button>
+		  <button class="button" on:click={clearCompletedTodos}>Clear completed</button>
 		</div>
 	  </div>
 	</div>
