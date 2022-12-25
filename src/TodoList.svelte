@@ -15,7 +15,6 @@
 
 	let cachedEditedTodoTitle = "";
   
-  const dispatcher = createEventDispatcher();
   const deleteTodo = (id) => {
       todos.update(todos => todos.filter(todo => todo.id !== id)) 
   }
