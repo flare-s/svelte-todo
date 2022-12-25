@@ -1,45 +1,63 @@
 <script>
     import {fade, fly} from "svelte/transition"
+    import {todos} from "./store/TodoStore"
 
-    export let filteredTodos;
-    export let currentFilter;
-    export let uncompletedTodos;
-    import {createEventDispatcher} from "svelte";
-    const dispatcher = createEventDispatcher();
-    const deleteTodo = (id) => {
-        dispatcher("todoDeleted", {
-            id,
-        })
-    }
+  let currentFilter = "all"
+	$: 
+		filteredTodos = currentFilter === "all" ? $todos 
+		: currentFilter === "active" 
+		? $todos.filter(todo => !todo.isComplete) 
+		: $todos.filter(todo => todo.isComplete)
+
+
+
+	$: uncompletedTodos = $todos.filter(todo => !todo.isComplete).length
+
+	let cachedEditedTodoTitle = "";
+  
+  const dispatcher = createEventDispatcher();
+  const deleteTodo = (id) => {
+      todos.update(todos => todos.filter(todo => todo.id !== id)) 
+  }
     const checkAllTodos = () => {
-        dispatcher("allTodosChecked")
+        	todos.update(todos => todos.map(todo => {
+            todo.isComplete = true;
+            return todo
+          })) 
     }
     const clearCompletedTodos = () => {
-        dispatcher("completedTodosCleared")
+        todos.update(todos => todos.filter(todo => !todo.isComplete))
     }
     const updateFilter = (filter) => {
-        dispatcher("filterUpdated", {
-            filter,
-        })
+        currentFilter = filter
     }
 
     const editTodo = (todo) => {
-		dispatcher("todoEdited", {
-            todo,
-        })
+    cachedEditedTodoTitle = todo.title;
+		todo.isEditing = true;
+		todos.update(todos => todos);
 	}
 
 	const editTodoDone = (todo) => {
-		dispatcher("todoEditingDone", {
-            todo,
-        })
+    todo.isEditing = false;
+		if (todo.title.trim() === "") {
+			todo.title = cachedEditedTodoTitle;
+		}
+		cachedEditedTodoTitle = ""
+		todos.update(todos => todos);
 	}
 
 	const exitEditingByKeyup = (event, todo) => {
-		dispatcher("exitedEditing", {
-            todo,
-            event
-        })
+		if (event.key === "Enter") {
+			editTodoDone(todo);
+		}
+
+		if (event.key === "Escape") {
+			todo.isEditing = false;
+			todo.title = cachedEditedTodoTitle;
+			cachedEditedTodoTitle = ""
+			todos.update(todos => todos);
+		}
 	}
 </script>
 <div>
